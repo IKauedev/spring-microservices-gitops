@@ -1,0 +1,62 @@
+name: validate
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  KUBECONFORM_VERSION: v0.6.7
+
+jobs:
+  # monta todos os overlays (env x app) e valida o YAML gerado contra os schemas do Kubernetes
+  manifests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instala o kubeconform
+        run: |
+          curl -fsSL "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
+            | tar xz -C /usr/local/bin kubeconform
+
+      - name: kustomize build + kubeconform (todos os overlays)
+        run: |
+          status=0
+          for dir in k8s/overlays/*/*/; do
+            echo "== $dir"
+            if ! kubectl kustomize "$dir" | kubeconform -strict -summary -ignore-missing-schemas -kubernetes-version 1.35.0; then
+              status=1
+            fi
+          done
+          exit $status
+
+  # toda Application/ApplicationSet precisa apontar para um caminho que existe no repositorio
+  argocd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Overlays referenciados pelo ApplicationSet existem
+        run: |
+          envs=$(grep -E '^\s+- env:' argocd/appsets/applications.yaml | awk '{print $3}')
+          apps=$(grep -E '^\s+- app:' argocd/appsets/applications.yaml | awk '{print $3}')
+          status=0
+          for e in $envs; do
+            for a in $apps; do
+              if [ ! -f "k8s/overlays/$e/$a/kustomization.yaml" ]; then
+                echo "FALTA k8s/overlays/$e/$a/kustomization.yaml"; status=1
+              fi
+            done
+          done
+          exit $status
