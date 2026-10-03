@@ -1,6 +1,3 @@
-# Gera uma Application por (ambiente x app): <app>-<env>, apontando para
-# k8s/overlays/<env>/<app>. Para um novo cluster, registre-o no Argo
-# (argocd cluster add <contexto>) e adicione o ambiente na lista abaixo.
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
