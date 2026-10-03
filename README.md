@@ -12,6 +12,13 @@ argocd/
   applications/      # uma Application por pasta de k8s/
 ```
 
+## Fonte única
+
+Este repositório é a **única fonte da configuração do cluster** (manifestos Kubernetes e
+Applications do Argo CD). O repositório das aplicações contém só o código e os scripts; ele
+clona este repositório quando precisa dos manifestos. Mudou um manifesto? Edite e dê push
+aqui: o Argo CD sincroniza a `master` sozinho.
+
 ## Como ativar
 
 Com o Argo CD instalado no cluster:
