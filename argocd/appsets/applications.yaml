@@ -1,0 +1,66 @@
+# Gera uma Application por (ambiente x app): <app>-<env>, apontando para
+# k8s/overlays/<env>/<app>. Para um novo cluster, registre-o no Argo
+# (argocd cluster add <contexto>) e adicione o ambiente na lista abaixo.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: applications
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - matrix:
+        generators:
+          # ---- ambientes / clusters ----
+          - list:
+              elements:
+                - env: dev
+                  server: https://kubernetes.default.svc
+                # - env: prod
+                #   server: https://<api-do-cluster-prod>   # apos "argocd cluster add"
+          # ---- aplicacoes ----
+          - list:
+              elements:
+                - app: platform
+                  namespace: argocd
+                - app: mongodb
+                  namespace: mongo
+                - app: department
+                  namespace: department
+                - app: employee
+                  namespace: employee
+                - app: organization
+                  namespace: organization
+                - app: gateway
+                  namespace: gateway
+  template:
+    metadata:
+      name: "{{.app}}-{{.env}}"
+      labels:
+        env: "{{.env}}"
+        app: "{{.app}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/IKauedev/spring-microservices-gitops.git
+        targetRevision: master
+        path: "k8s/overlays/{{.env}}/{{.app}}"
+      destination:
+        server: "{{.server}}"
+        namespace: "{{.namespace}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+      # o HPA controla o numero de replicas; o Argo nao deve reverter isso
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jsonPointers:
+            - /spec/replicas
+  # apagar o ApplicationSet (ou uma Application) nao apaga os recursos do cluster
+  syncPolicy:
+    preserveResourcesOnDeletion: true

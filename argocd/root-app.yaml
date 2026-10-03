@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/IKauedev/spring-microservices-gitops.git
     targetRevision: master
-    path: argocd/applications
+    path: argocd/appsets
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
