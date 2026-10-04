@@ -4,3 +4,11 @@ kind: Kustomization
 namespace: argo-rollouts
 resources:
   - https://github.com/argoproj/argo-rollouts/releases/download/v1.8.3/install.yaml
+# CRDs grandes: aplicados com Server-Side Apply para o Argo CD nao ficar OutOfSync
+patches:
+  - target:
+      kind: CustomResourceDefinition
+    patch: |-
+      - op: add
+        path: /metadata/annotations/argocd.argoproj.io~1sync-options
+        value: ServerSideApply=true
