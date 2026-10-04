@@ -4,7 +4,7 @@ namespace: gateway
 resources:
   - serviceaccount.yaml
   - configmap.yaml
-  - deployment.yaml
+  - rollout.yaml
   - service.yaml
   - hpa.yaml
   - ingress.yaml

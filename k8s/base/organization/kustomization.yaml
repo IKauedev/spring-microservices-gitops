@@ -5,6 +5,6 @@ resources:
   - serviceaccount.yaml
   - configmap.yaml
   - secret.yaml
-  - deployment.yaml
+  - rollout.yaml
   - service.yaml
   - hpa.yaml

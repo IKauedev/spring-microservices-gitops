@@ -19,6 +19,8 @@ spec:
           # ---- aplicacoes ----
           - list:
               elements:
+                - app: argo-rollouts
+                  namespace: argo-rollouts
                 - app: platform
                   namespace: argocd
                 - app: mongodb
@@ -56,6 +58,10 @@ spec:
       ignoreDifferences:
         - group: apps
           kind: Deployment
+          jsonPointers:
+            - /spec/replicas
+        - group: argoproj.io
+          kind: Rollout
           jsonPointers:
             - /spec/replicas
   # apagar o ApplicationSet (ou uma Application) nao apaga os recursos do cluster

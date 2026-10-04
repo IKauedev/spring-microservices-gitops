@@ -1,22 +1,31 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
-  name: department
+  name: gateway
   labels:
-    app: department
+    app: gateway
 spec:
+  strategy:
+    canary:
+      steps:
+        - setWeight: 25
+        - pause: {duration: 30s}
+        - setWeight: 50
+        - pause: {duration: 30s}
+        - setWeight: 75
+        - pause: {duration: 30s}
   selector:
     matchLabels:
-      app: department
+      app: gateway
   template:
     metadata:
       labels:
-        app: department
+        app: gateway
     spec:
       serviceAccountName: api-service-account
       containers:
-        - name: department
-          image: vmware/department:1.1
+        - name: gateway
+          image: vmware/gateway:1.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -44,10 +53,3 @@ spec:
             timeoutSeconds: 2
             periodSeconds: 20
             failureThreshold: 5
-          volumeMounts:
-            - name: mongodb
-              mountPath: /etc/secretspot
-      volumes:
-        - name: mongodb
-          secret:
-            secretName: department

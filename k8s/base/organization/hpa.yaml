@@ -4,8 +4,8 @@ metadata:
   name: organization-hpa
 spec:
   scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
     name: organization
   minReplicas: 1
   maxReplicas: 3
