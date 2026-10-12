@@ -1,0 +1,17 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-default-labels
+spec:
+  rules:
+    - name: add-managed-by
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+              namespaces: [department, employee, organization, gateway]
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            labels:
+              +(app.kubernetes.io/managed-by): argocd

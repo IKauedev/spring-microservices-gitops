@@ -21,6 +21,10 @@ spec:
               elements:
                 - app: argo-rollouts
                   namespace: argo-rollouts
+                - app: kyverno
+                  namespace: kyverno
+                - app: policies
+                  namespace: kyverno
                 - app: platform
                   namespace: argocd
                 - app: mongodb
