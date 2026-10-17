@@ -1,0 +1,17 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-delay-employee
+  namespace: employee
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces: [employee]
+    labelSelectors:
+      app: employee
+  delay:
+    latency: 500ms
+    jitter: 100ms
+    correlation: "50"
+  duration: 2m

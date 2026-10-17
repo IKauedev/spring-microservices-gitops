@@ -1,0 +1,12 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-employee
+  namespace: employee
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces: [employee]
+    labelSelectors:
+      app: employee

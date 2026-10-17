@@ -1,0 +1,16 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: cpu-stress-employee
+  namespace: employee
+spec:
+  mode: one
+  selector:
+    namespaces: [employee]
+    labelSelectors:
+      app: employee
+  stressors:
+    cpu:
+      workers: 2
+      load: 80
+  duration: 3m
